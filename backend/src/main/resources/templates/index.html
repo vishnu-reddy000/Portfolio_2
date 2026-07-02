@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // Theme initialization to prevent layout flash on load
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', initialTheme);
+    </script>
+    <title>M. Vishnu Vardhan Reddy | Portfolio</title>
+    <meta name="description"
+        content="Portfolio of M. Vishnu Vardhan Reddy, Associate Software Engineer, Java Full Stack Developer & UI/UX Designer.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../static/favicon.svg" th:href="@{/favicon.svg}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../static/css/index.css" th:href="@{/css/index.css}">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function () {
+            emailjs.init({
+                publicKey: "Z6HISsisZ2jyeFRQn",
+            });
+        })();
+    </script>
+    <!-- Custom JS -->
+    <script src="../static/js/index.js" th:src="@{/js/index.js}" defer></script>
+</head>
+
+<body>
+
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="nav-container">
+            <a href="#" class="logo" id="logoText">VISHNU<span> Vardhan Reddy</span></a>
+            <nav class="nav-menu" id="navMenu">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#experience" class="nav-link">Experience</a>
+                <a href="#projects" class="nav-link">Projects</a>
+                <a href="#skills" class="nav-link">Skills</a>
+                <a href="#process" class="nav-link">Process</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </nav>
+            <div class="nav-actions">
+                <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme"
+                    style="background: transparent; border: 1px solid var(--border-color); color: var(--text-dark); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition);">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <a href="#contact" class="btn btn-primary btn-nav">Hire Me</a>
+                <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <span class="hero-tag">Welcome to my Portfolio</span>
+                    <h1 class="hero-title" id="heroTitle">Crafting Scalable Backends & Premium UIs</h1>
+                    <p class="hero-subtitle" id="heroSubtitle">
+                        I am M. Vishnu Vardhan Reddy, an Associate Software Engineer & Full Stack Developer. I build
+                        enterprise-grade Java applications using Spring Boot, design scalable REST APIs, and create
+                        premium user experiences.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#projects" class="btn btn-dark">Explore Work</a>
+                        <a href="#contact" class="btn btn-outline"><i class="fa-solid fa-envelope"></i> Let's Talk</a>
+                    </div>
+                </div>
+                <div class="hero-graphic-container">
+                    <div class="hero-graphic-bg">
+                        <!-- Modern, premium abstract representation matching the soft-blue lighting in the UI mockup -->
+                        <div class="glow-element glow-1"></div>
+                        <div class="glow-element glow-2"></div>
+                        <img id="profileAvatar" src="" alt="Vishnu Vardhan Reddy">
+                    </div>
+                    <div class="floating-badge badge-1">
+                        <i class="fa-brands fa-envira spring-icon"></i>
+                        <span>Spring Boot</span>
+                    </div>
+                    <div class="floating-badge badge-2">
+                        <i class="fa-brands fa-figma figma-icon"></i>
+                        <span>UI/UX Design</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Me Section -->
+        <section id="about" class="about-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2 class="section-title">About Me</h2>
+                    <p class="section-desc">Who I am and my career objective</p>
+                </div>
+                <div class="about-grid">
+                    <div class="about-card text-card">
+                        <h3 class="card-subtitle">Career Objective</h3>
+                        <p class="objective-text" id="objectiveText">
+                            Results-driven Java Full Stack Developer with hands-on professional experience in building
+                            enterprise-grade web applications using Java, Spring Boot, REST APIs, and MySQL. Holds a
+                            B.Tech in Electrical and Electronics Engineering complemented by recognized industry
+                            certifications and real-world project delivery. Passionate about clean architecture,
+                            scalable systems, and continuous improvement.
+                        </p>
+                        <div class="about-stats"
+                            style="display: flex; gap: 24px; margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                            <div class="stat-item" style="flex: 1;">
+                                <h4 id="statExp"
+                                    style="font-size: 2rem; color: var(--primary); font-family: var(--font-body); font-weight: 700;">
+                                    2024</h4>
+                                <span
+                                    style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">Starting
+                                    Year</span>
+                            </div>
+                            <div class="stat-item" style="flex: 1;">
+                                <h4 id="statProjects"
+                                    style="font-size: 2rem; color: var(--primary); font-family: var(--font-body); font-weight: 700;">
+                                    5+</h4>
+                                <span
+                                    style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">Projects</span>
+                            </div>
+                            <div class="stat-item" style="flex: 1;">
+                                <h4 id="statAcademic"
+                                    style="font-size: 2rem; color: var(--primary); font-family: var(--font-body); font-weight: 700;">
+                                    7.66 CGPA</h4>
+                                <span
+                                    style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 500;">Academic
+                                    Standing</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-card education-card">
+                        <h3 class="card-subtitle">Education</h3>
+                        <ul class="education-list" id="educationList">
+                            <li>
+                                <div class="edu-dot"></div>
+                                <span class="edu-year">2020 – 2024</span>
+                                <h4 class="edu-title">B.Tech – Electrical & Electronics Engineering</h4>
+                                <p class="edu-inst">Sreenivasa Institute of Technology & Management Studies, JNTU-A</p>
+                                <span class="edu-grade">CGPA: 7.66</span>
+                            </li>
+                            <li>
+                                <div class="edu-dot"></div>
+                                <span class="edu-year">2020</span>
+                                <h4 class="edu-title">Intermediate (MPC)</h4>
+                                <p class="edu-inst">Sri Chaitanya Junior College, Andhra Pradesh</p>
+                                <span class="edu-grade">CGPA: 8.73</span>
+                            </li>
+                            <li>
+                                <div class="edu-dot"></div>
+                                <span class="edu-year">2018</span>
+                                <h4 class="edu-title">Class X (SSC)</h4>
+                                <p class="edu-inst">Camford English Medium School</p>
+                                <span class="edu-grade">GPA: 8.7</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Professional Experience Section -->
+        <section id="experience" class="experience-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2 class="section-title">Professional Experience</h2>
+                    <p class="section-desc">My professional journey so far</p>
+                </div>
+                <div class="experience-timeline" id="experienceTimeline">
+                    <div class="experience-item">
+                        <div class="exp-meta">
+                            <span class="exp-duration">Apr 2025 – Present</span>
+                            <h3 class="exp-company">Speshway Solutions Pvt. Ltd.</h3>
+                            <span class="exp-location"><i class="fa-solid fa-location-dot"></i> Hyderabad, India</span>
+                        </div>
+                        <div class="exp-details">
+                            <h4 class="exp-role">Associate Software Engineer</h4>
+                            <ul class="exp-bullets">
+                                <li>Developed and maintained enterprise-level Java Full Stack applications using Java,
+                                    Spring Boot, JavaScript, HTML, CSS, REST APIs, and MySQL.</li>
+                                <li>Contributed to the development of a Smart Office Management System that streamlined
+                                    internal workflow processes and improved operational efficiency.</li>
+                                <li>Worked on a Multi-Tenant SaaS-based CRM platform with role-based access,
+                                    tenant-specific configurations, and scalable backend architecture.</li>
+                                <li>Designed and integrated RESTful APIs for seamless frontend-backend communication and
+                                    third-party integrations.</li>
+                                <li>Collaborated with cross-functional teams in Agile sprints to deliver
+                                    production-ready features on schedule.</li>
+                                <li>Improved application responsiveness and optimized database queries, reducing page
+                                    load and API response times.</li>
+                                <li>Managed version control using Git and GitHub for code collaboration and branch
+                                    management.</li>
+                                <li>Participated in deployment and CI/CD support activities using Jenkins and cloud
+                                    deployment workflows.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="projects-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2 class="section-title">Projects</h2>
+                    <p class="section-desc">Projects I have designed and engineered</p>
+                </div>
+                <!-- Dynamic Projects Grid -->
+                <div class="projects-grid" id="projectsGrid">
+                    <!-- Project cards will be injected by JavaScript -->
+                    <div class="loading-state">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Loading projects...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="skills-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2 class="section-title">Technical Skills</h2>
+                    <p class="section-desc">Technologies and tools I specialize in</p>
+                </div>
+                <!-- Dynamic Skills Container -->
+                <div class="skills-categories-grid" id="skillsGrid">
+                    <!-- Skills lists will be injected by JavaScript -->
+                    <div class="loading-state">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Loading skills...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Design Process Section -->
+        <section id="process" class="process-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2 class="section-title">My Design Process</h2>
+                    <p class="section-desc">A structured approach to building exceptional digital products</p>
+                </div>
+                <div class="process-grid">
+                    <div class="process-step">
+                        <span class="process-num">01</span>
+                        <div class="process-icon-wrapper">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                        <h3 class="process-step-title">Discover</h3>
+                        <p class="process-step-desc">Research, insights & understanding your goals.</p>
+                    </div>
+                    <div class="process-step">
+                        <span class="process-num">02</span>
+                        <div class="process-icon-wrapper">
+                            <i class="fa-regular fa-lightbulb"></i>
+                        </div>
+                        <h3 class="process-step-title">Define</h3>
+                        <p class="process-step-desc">Strategy, user flows & information architecture.</p>
+                    </div>
+                    <div class="process-step">
+                        <span class="process-num">03</span>
+                        <div class="process-icon-wrapper">
+                            <i class="fa-solid fa-pen-nib"></i>
+                        </div>
+                        <h3 class="process-step-title">Design</h3>
+                        <p class="process-step-desc">Wireframes, UI design & visual exploration.</p>
+                    </div>
+                    <div class="process-step">
+                        <span class="process-num">04</span>
+                        <div class="process-icon-wrapper">
+                            <i class="fa-solid fa-laptop-code"></i>
+                        </div>
+                        <h3 class="process-step-title">Develop</h3>
+                        <p class="process-step-desc">Collaborate with developers to bring it to life.</p>
+                    </div>
+                    <div class="process-step">
+                        <span class="process-num">05</span>
+                        <div class="process-icon-wrapper">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </div>
+                        <h3 class="process-step-title">Deliver</h3>
+                        <p class="process-step-desc">Test, optimize & launch with confidence.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="contact-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <h2 class="section-title">Get In Touch</h2>
+                    <p class="section-desc">Let's collaborate on your next project</p>
+                </div>
+                <div class="contact-grid">
+                    <div class="contact-info-card">
+                        <h3>Contact Information</h3>
+                        <p class="contact-pitch">Feel free to reach out to me for project opportunities, job offers, or
+                            just to say hi!</p>
+                        <div class="info-items">
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
+                                <div class="info-text">
+                                    <span>Email</span>
+                                    <a id="contactEmail"
+                                        href="mailto:vishnumatamala10@gmail.com">vishnumatamala10@gmail.com</a>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
+                                <div class="info-text">
+                                    <span>Phone</span>
+                                    <a id="contactPhone" href="tel:+918074407095">+91 8074407095</a>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+                                <div class="info-text">
+                                    <span>Location</span>
+                                    <p id="contactLocation">Andhra Pradesh, India</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="social-links">
+                            <a id="linkedinLink" href="https://linkedin.com" target="_blank" aria-label="LinkedIn"><i
+                                    class="fa-brands fa-linkedin-in"></i></a>
+                            <a id="naukriLink" href="#" target="_blank" aria-label="Naukri"><i
+                                    class="fa-solid fa-briefcase"></i></a>
+                            <a id="githubLink" href="https://github.com" target="_blank" aria-label="GitHub"><i
+                                    class="fa-brands fa-github"></i></a>
+                        </div>
+                    </div>
+                    <div class="contact-form-card">
+                        <h3>Send a Message</h3>
+                        <form id="contactForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="name">Your Name</label>
+                                    <input type="text" id="name" required placeholder="e.g. John Doe">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Your Email</label>
+                                    <input type="email" id="email" required placeholder="e.g. john@example.com">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Your Message</label>
+                                <textarea id="message" rows="5" required
+                                    placeholder="Describe your project, question, or collaboration opportunity..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-dark btn-submit" id="submitBtn">
+                                <span>Send Message</span> <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                            <div class="form-alert" id="formAlert"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="#" class="logo">VISHNU<span>.M</span></a>
+                <p>Associate Software Engineer & UI/UX Enthusiast. Designing and developing state-of-the-art enterprise
+                    web systems.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <a href="#about">About</a>
+                <a href="#experience">Experience</a>
+                <a href="#projects">Projects</a>
+                <a href="#skills">Skills</a>
+                <a href="#process">Process</a>
+                <a href="#contact">Contact</a>
+            </div>
+
+        </div>
+        <div class="footer-bottom">
+            <p id="copyrightText">&copy; 2026 M. Vishnu Vardhan Reddy. All Rights Reserved.</p>
+            <div class="footer-socials">
+                <a id="footerLinkedinLink" href="#" target="_blank" aria-label="LinkedIn"><i
+                        class="fa-brands fa-linkedin-in"></i></a>
+                <a id="footerNaukriLink" href="#" target="_blank" aria-label="Naukri"><i
+                        class="fa-solid fa-briefcase"></i></a>
+                <a id="footerGithubLink" href="#" target="_blank" aria-label="GitHub"><i
+                        class="fa-brands fa-github"></i></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Console | M. Vishnu Vardhan Reddy Portfolio</title>
+
+  <script>
+    // Theme initialization to prevent layout flash on load
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', initialTheme);
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../static/favicon.svg" th:href="@{/favicon.svg}">
+
+  <!-- Shared CSS Stylesheet -->
+  <link rel="stylesheet" href="../static/css/index.css" th:href="@{/css/index.css}">
+  <link rel="stylesheet" href="../static/css/admin.css" th:href="@{/css/admin.css}">
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Admin JS -->
+  <script src="../static/js/admin.js" th:src="@{/js/admin.js}" defer></script>
+
+  <!-- Custom Admin Styles -->
+  <style>
+    :root {
+      --primary: #1a3038;
+      --primary-hover: #2b4954;
+      --accent: #b0c9d2;
+      --gradient-primary: linear-gradient(135deg, #1a3038, #b0c9d2);
+      --shadow-glow: 0 0 20px rgba(176, 201, 210, 0.2);
+      --bg-secondary: #f7f9fa;
+      --bg-tertiary: rgba(26, 48, 56, 0.08);
+      --font-heading: 'Outfit', sans-serif;
+      --border-radius: 16px;
+      --max-width: 1200px;
+      --bg-glass: rgba(255, 255, 255, 0.85);
+      --border-glass: #e3ecef;
+      --text-primary: #1b2d36;
+      --text-secondary: #5e727c;
+      --text-muted: #8fa0a8;
+      --shadow-lg: 0 20px 40px rgba(26, 48, 56, 0.08);
+    }
+
+    [data-theme="dark"] {
+      --primary: #b0c9d2;
+      --primary-hover: #cbe0e7;
+      --accent: #1a3038;
+      --gradient-primary: linear-gradient(135deg, #b0c9d2, #1a3038);
+      --shadow-glow: 0 0 20px rgba(26, 48, 56, 0.4);
+      --bg-secondary: #0d161a;
+      --bg-tertiary: rgba(176, 201, 210, 0.08);
+      --bg-glass: rgba(13, 22, 26, 0.9);
+      --border-glass: #1b2d36;
+      --text-primary: #f7f9fa;
+      --text-secondary: #8fa0a8;
+      --text-muted: #5e727c;
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    #login-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      box-sizing: border-box;
+      background-color: var(--bg-secondary);
+    }
+
+    .admin-container {
+      max-width: var(--max-width);
+      margin: 120px auto 40px auto;
+      padding: 0 24px;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      padding: 40px;
+      border-radius: var(--border-radius);
+      margin: 0;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .admin-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar-btn {
+      width: 100%;
+      text-align: left;
+      padding: 14px 20px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      color: var(--text-secondary);
+      border-radius: 12px;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar-btn:hover {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+
+    .sidebar-btn.active {
+      color: #ffffff;
+      background: var(--primary);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .admin-content-pane {
+      padding: 40px;
+      border-radius: var(--border-radius);
+      min-height: 400px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+    }
+
+    .admin-form-section {
+      display: none;
+    }
+
+    .admin-form-section.active {
+      display: block;
+    }
+
+    .avatar-preview-container {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 30px;
+      padding: 20px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed var(--border-glass);
+    }
+
+    .admin-avatar-preview {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+
+    .upload-btn-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .upload-btn-wrapper input[type=file] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-glass);
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    .logout-btn {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      border-radius: 20px;
+      border: 1px solid var(--border-glass);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      color: #ff4d4d;
+      border-color: rgba(255, 77, 77, 0.3);
+      background: rgba(255, 77, 77, 0.05);
+    }
+
+    /* Override input rules slightly to prevent style clashes */
+    .form-group textarea {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border-glass);
+      border-radius: 12px;
+      padding: 16px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      outline: none;
+      resize: vertical;
+    }
+
+    .form-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .form-group label {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 0.95rem;
+    }
+
+    .form-group input:focus~label,
+    .form-group input:not(:placeholder-shown)~label,
+    .form-group input:-webkit-autofill~label,
+    .form-group input:autofill~label,
+    .form-group textarea:focus~label,
+    .form-group textarea:not(:placeholder-shown)~label {
+      top: -10px;
+      left: 12px;
+      font-size: 0.75rem;
+      color: var(--primary);
+      background: var(--bg-secondary);
+      padding: 0 6px;
+      transform: none;
+    }
+
+    @media (max-width: 992px) {
+      #mobile-nav-toggle {
+        display: flex !important;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      /* Swipeable horizontal sub-tabs selector on mobile */
+      .admin-sidebar {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 10px;
+        gap: 10px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        border-bottom: 1px solid var(--border-glass);
+        margin-bottom: 10px;
+      }
+
+      .admin-sidebar::-webkit-scrollbar {
+        display: none;
+      }
+
+      .sidebar-btn {
+        width: auto;
+        white-space: nowrap;
+        padding: 10px 16px;
+        font-size: 0.85rem;
+      }
+
+      .sidebar-btn:hover {
+        transform: none;
+      }
+
+      .admin-content-pane {
+        padding: 24px;
+      }
+
+      #logout-btn {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .logo {
+        font-size: 1.15rem !important;
+      }
+
+      .navbar {
+        padding: 0 12px;
+      }
+
+      .admin-container {
+        margin-top: 100px;
+        padding: 0 16px;
+      }
+    }
+
+    .experience-card-admin {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-glass);
+      margin-bottom: 12px;
+    }
+
+    .experience-card-admin .card-info-admin h5 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .experience-card-admin .card-info-admin span {
+      font-size: 0.8rem;
+      color: var(--primary);
+    }
+
+    .experience-card-admin .card-actions-admin {
+      display: flex;
+      gap: 12px;
+    }
+
+    .admin-btn-icon {
+      background: transparent;
+      border: 1px solid var(--border-glass);
+      color: var(--text-secondary);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .admin-btn-icon:hover {
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+      border-color: var(--primary);
+    }
+
+    .admin-btn-icon.delete:hover {
+      color: #ff4d4d;
+      border-color: rgba(255, 77, 77, 0.3);
+      background: rgba(255, 77, 77, 0.05);
+    }
+
+    .project-card-admin {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-glass);
+      margin-bottom: 12px;
+    }
+
+    .project-card-admin .card-info-admin {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .project-card-admin .card-info-text-admin h5 {
+      font-size: 1rem;
+      margin: 0 0 4px 0;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .project-card-admin .card-info-text-admin span {
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .project-card-admin .card-actions-admin {
+      display: flex;
+      gap: 12px;
+    }
+
+    .project-card-admin .project-thumbnail-admin {
+      width: 60px;
+      height: 40px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--border-glass);
+    }
+
+    .skill-card-admin {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-glass);
+      margin-bottom: 12px;
+    }
+
+    .skill-card-admin .card-info-admin {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .skill-card-admin .card-info-text-admin h5 {
+      font-size: 1rem;
+      margin: 0 0 4px 0;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .skill-card-admin .card-info-text-admin span {
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .skill-card-admin .card-actions-admin {
+      display: flex;
+      gap: 12px;
+    }
+
+    #logout-link {
+      display: none !important;
+    }
+
+    @media (max-width: 992px) {
+      #logout-link {
+        display: inline-flex !important;
+        color: #ff4d4d;
+        border-top: 1px solid var(--border-glass);
+        margin-top: 10px;
+        padding-top: 10px;
+      }
+    }
+  </style>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+  <!-- Header Brand Navigation Bar -->
+  <header class="header" id="navbar">
+    <div class="nav-container">
+      <a href="/index" class="logo">
+        VISHNU<span> Vardhan Reddy</span>
+      </a>
+
+      <nav class="nav-menu" id="nav-menu">
+        <a href="/index" class="nav-link">Go to Portfolio</a>
+        <a href="/admin" class="nav-link active">Console</a>
+        <a href="#" id="logout-link" class="nav-link">Sign Out</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button id="theme-toggle" class="logout-btn" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border-radius: 50%; border: 1px solid var(--border-glass); background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.3s ease;">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="logout-btn" class="logout-btn" style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-left: 8px;">
+          <span>Sign Out</span> <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+        <button class="mobile-toggle" id="mobile-nav-toggle" aria-label="Toggle Menu" style="display: none; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; border-radius: 50%; border: 1px solid var(--border-glass); background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.3s ease; margin-left: 8px;">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login Section -->
+  <div id="login-section">
+    <div class="auth-card" style="border: 1px solid var(--border-glass); background: var(--bg-glass); box-shadow: var(--shadow-lg); text-align: center;">
+      <div class="auth-icon" style="width: 60px; height: 60px; border-radius: 50%; background: var(--bg-secondary); border: 1px solid var(--border-glass); display: flex; align-items: center; justify-content: center; color: var(--primary); margin: 0 auto 20px auto; box-shadow: var(--shadow-glow);">
+        <i class="fa-solid fa-user-shield" style="font-size: 1.5rem;"></i>
+      </div>
+      <h2 style="margin-bottom: 8px; font-weight: 800; font-size: 2rem; color: var(--text-primary);">Admin Access</h2>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 30px;">Secure gateway authentication required</p>
+
+      <form id="login-form">
+        <div class="form-group" style="margin-bottom: 24px; position: relative;">
+          <input type="text" id="username" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: var(--bg-secondary); color: var(--text-primary); outline: none;">
+          <label for="username">Username</label>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 30px; position: relative; display: flex; align-items: center;">
+          <input type="password" id="password" placeholder=" " required style="width: 100%; padding: 16px 48px 16px 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: var(--bg-secondary); color: var(--text-primary); outline: none;">
+          <label for="password">Password</label>
+          <span id="toggle-password" style="position: absolute; right: 16px; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; height: 100%; z-index: 10;">
+            <i class="fa-solid fa-eye-slash"></i>
+          </span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-bottom: 15px;">
+          <span>Login</span> <i class="fa-solid fa-right-to-bracket"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard Section (Hidden by Default) -->
+  <div id="dashboard-section" style="display: none;">
+    <div class="admin-container">
+      <!-- Minimalist console header -->
+      <div style="margin-bottom: 30px; display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Portfolio Management Console</span>
+        <h2 style="font-size: 2.2rem; font-weight: 800; color: var(--text-primary);">Welcome back, Vishnu</h2>
+        <p style="color: var(--text-secondary); font-size: 0.95rem;">Select an inventory category from the sidebar menu to update your live portfolio content.</p>
+        <div style="width: 80px; height: 4px; background: var(--primary); border-radius: 2px; margin-top: 8px;"></div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
+          <button class="sidebar-btn active" data-target="profile-details-section">
+            <i class="fa-solid fa-user"></i> Profile Details
+          </button>
+          <button class="sidebar-btn" data-target="avatar-section">
+            <i class="fa-solid fa-image"></i> Profile Photo
+          </button>
+          <button class="sidebar-btn" data-target="socials-section">
+            <i class="fa-solid fa-link"></i> Socials & Contact
+          </button>
+          <button class="sidebar-btn" data-target="experience-section">
+            <i class="fa-solid fa-briefcase"></i> Professional Experience
+          </button>
+          <button class="sidebar-btn" data-target="education-section">
+            <i class="fa-solid fa-graduation-cap"></i> Education Timeline
+          </button>
+          <button class="sidebar-btn" data-target="projects-admin-section">
+            <i class="fa-solid fa-folder-open"></i> Projects Portfolio
+          </button>
+          <button class="sidebar-btn" data-target="skills-admin-section">
+            <i class="fa-solid fa-award"></i> Skillset Inventory
+          </button>
+        </aside>
+
+        <!-- Form Pane -->
+        <main class="admin-content-pane">
+          <!-- SECTION 1: PROFILE DETAILS -->
+          <section id="profile-details-section" class="admin-form-section active">
+            <div style="margin-bottom: 30px;">
+              <span style="font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Profile Management</span>
+              <h3 style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: var(--text-primary);">Core Profile Information</h3>
+              <div style="width: 40px; height: 3px; background: var(--primary); border-radius: 2px; margin-top: 10px;"></div>
+            </div>
+            <form id="profile-form">
+              <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                <input type="text" id="profile-name" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                <label for="profile-name">Full Name</label>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                <input type="text" id="profile-title" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                <label for="profile-title">Hero Title</label>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                <textarea id="profile-subtitle" rows="3" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;"></textarea>
+                <label for="profile-subtitle">Hero Subtitle</label>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 30px; position: relative;">
+                <textarea id="profile-bio" rows="6" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;"></textarea>
+                <label for="profile-bio">About Me Narrative</label>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                  <input type="text" id="profile-exp" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                  <label for="profile-exp">Years Experience / Detail (e.g. 2024)</label>
+                </div>
+                <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                  <input type="text" id="profile-projects" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                  <label for="profile-projects">Core Projects (e.g. 5+)</label>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 30px; position: relative;">
+                <input type="text" id="profile-academic" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                <label for="profile-academic">Academic Standing / CGPA (e.g. 7.66)</label>
+              </div>
+
+              <button type="submit" class="btn btn-primary">
+                Save Changes <i class="fa-solid fa-check"></i>
+              </button>
+            </form>
+          </section>
+
+          <!-- SECTION 2: PROFILE PHOTO -->
+          <section id="avatar-section" class="admin-form-section">
+            <div style="margin-bottom: 30px;">
+              <span style="font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Avatar Configuration</span>
+              <h3 style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: var(--text-primary);">Manage Profile Photo</h3>
+              <div style="width: 40px; height: 3px; background: var(--primary); border-radius: 2px; margin-top: 10px;"></div>
+            </div>
+
+            <!-- Current Photo Preview Row -->
+            <div style="display:flex;align-items:center;gap:24px;margin-bottom:32px;padding:20px;border-radius:16px;background:var(--bg-secondary);border:1px solid var(--border-glass);">
+              <img id="avatar-preview" src="" alt="Current Profile Photo" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--primary);flex-shrink:0;">
+              <div>
+                <h4 style="font-size:1.05rem;margin-bottom:6px; color: var(--text-primary);">Current Profile Photo</h4>
+                <p style="color:var(--text-secondary);font-size:0.85rem;line-height:1.5;">This photo is shown on your portfolio homepage. Paste a new Cloudinary URL below to replace it instantly.</p>
+              </div>
+            </div>
+
+            <!-- Generated/Pasted URL -->
+            <div style="margin-bottom:24px;">
+              <label style="display:block;font-size:0.78rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">Cloudinary URL (auto-generated or paste direct link)</label>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <input type="text" id="avatar-url-display" placeholder="Paste a Cloudinary URL or upload an image..." style="flex:1;padding:14px 16px;border-radius:12px;border:1px solid var(--border-glass);background:transparent;color:var(--text-primary);outline:none;font-size:0.85rem;min-width:0;">
+              </div>
+            </div>
+
+            <!-- Save Button -->
+            <button type="button" id="save-photo-btn" class="btn btn-primary" style="width:100%;justify-content:center;padding:16px 28px;font-size:1rem;">
+              <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i>
+              <span>Save &amp; Apply Profile Photo</span>
+            </button>
+          </section>
+
+          <!-- SECTION 3: SOCIALS & CONTACT -->
+          <section id="socials-section" class="admin-form-section">
+            <div style="margin-bottom: 30px;">
+              <span style="font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Connect Channels</span>
+              <h3 style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: var(--text-primary);">Socials & Contact Links</h3>
+              <div style="width: 40px; height: 3px; background: var(--primary); border-radius: 2px; margin-top: 10px;"></div>
+            </div>
+            <form id="socials-form">
+              <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                <input type="url" id="social-github" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                <label for="social-github">GitHub Profile URL</label>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                <input type="url" id="social-linkedin" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                <label for="social-linkedin">LinkedIn Profile URL</label>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                <input type="url" id="social-naukri" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                <label for="social-naukri">Naukri Profile URL</label>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                <input type="email" id="social-email" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                <label for="social-email">Public Email Address</label>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                <input type="text" id="social-phone" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                <label for="social-phone">Call / WhatsApp Number</label>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 30px; position: relative;">
+                <input type="text" id="social-location" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                <label for="social-location">Location (City, Country)</label>
+              </div>
+
+              <button type="submit" class="btn btn-primary">
+                Save Social Configurations <i class="fa-solid fa-check"></i>
+              </button>
+            </form>
+          </section>
+
+          <!-- SECTION 5: PROFESSIONAL EXPERIENCE -->
+          <section id="experience-section" class="admin-form-section">
+            <div style="margin-bottom: 30px;">
+              <span style="font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Professional Journey</span>
+              <h3 style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: var(--text-primary);">Manage Professional Experience</h3>
+              <div style="width: 40px; height: 3px; background: var(--primary); border-radius: 2px; margin-top: 10px;"></div>
+            </div>
+
+            <!-- Dynamic Experience List -->
+            <div id="experience-list-container" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 30px;">
+              <!-- Dynamic list loaded from JS -->
+            </div>
+
+            <!-- Add/Edit form -->
+            <div style="padding: 24px; border-radius: var(--border-radius); border: 1px solid var(--border-glass); background: var(--bg-secondary);">
+              <h4 id="experience-form-title" style="margin-bottom: 20px; color: var(--text-primary);">Add New Experience</h4>
+              <form id="experience-form">
+                <input type="hidden" id="exp-id">
+
+                <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                  <input type="text" id="exp-role" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                  <label for="exp-role">Role Title (e.g. Associate Software Engineer)</label>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                    <input type="text" id="exp-company" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                    <label for="exp-company">Company Name (e.g. Speshway Solutions Pvt. Ltd.)</label>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                    <input type="text" id="exp-location" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                    <label for="exp-location">Location (e.g. Hyderabad, India)</label>
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                  <input type="text" id="exp-duration" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                  <label for="exp-duration">Duration (e.g. Apr 2025 – Present)</label>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                  <textarea id="exp-bullets" rows="6" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;"></textarea>
+                  <label for="exp-bullets">Job Description Bullets (Each bullet on a new line)</label>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                  <button type="submit" id="exp-submit-btn" class="btn btn-primary">
+                    <span>Add Item</span> <i class="fa-solid fa-plus"></i>
+                  </button>
+                  <button type="button" id="exp-cancel-btn" class="btn btn-outline" style="display: none;">
+                    Cancel <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- SECTION 5B: EDUCATION TIMELINE -->
+          <section id="education-section" class="admin-form-section">
+            <div style="margin-bottom: 30px;">
+              <span style="font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Academic Chronology</span>
+              <h3 style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: var(--text-primary);">Manage Education Timeline</h3>
+              <div style="width: 40px; height: 3px; background: var(--primary); border-radius: 2px; margin-top: 10px;"></div>
+            </div>
+
+            <!-- Dynamic Education List -->
+            <div id="education-list-container" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 30px;">
+              <!-- Dynamic list loaded from JS -->
+            </div>
+
+            <!-- Add/Edit form -->
+            <div style="padding: 24px; border-radius: var(--border-radius); border: 1px solid var(--border-glass); background: var(--bg-secondary);">
+              <h4 id="education-form-title" style="margin-bottom: 20px; color: var(--text-primary);">Add New Education</h4>
+              <form id="education-form">
+                <input type="hidden" id="edu-id">
+
+                <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                  <input type="text" id="edu-role" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                  <label for="edu-role">Degree / Qualification Title (e.g. B.Tech – Electrical & Electronics Engineering)</label>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                    <input type="text" id="edu-school" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                    <label for="edu-school">Institution / School Name (e.g. Sreenivasa Institute of Technology)</label>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                    <input type="text" id="edu-grade" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                    <label for="edu-grade">Grade & Location (e.g. CGPA: 7.66 | Chittoor, India)</label>
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                  <input type="text" id="edu-duration" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                  <label for="edu-duration">Duration (e.g. 2020 – 2024)</label>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                  <button type="submit" id="edu-submit-btn" class="btn btn-primary">
+                    <span>Add Item</span> <i class="fa-solid fa-plus"></i>
+                  </button>
+                  <button type="button" id="edu-cancel-btn" class="btn btn-outline" style="display: none;">
+                    Cancel <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- SECTION 6: PROJECTS PORTFOLIO -->
+          <section id="projects-admin-section" class="admin-form-section">
+            <div style="margin-bottom: 30px;">
+              <span style="font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Milestone Showcase</span>
+              <h3 style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: var(--text-primary);">Manage Projects Portfolio</h3>
+              <div style="width: 40px; height: 3px; background: var(--primary); border-radius: 2px; margin-top: 10px;"></div>
+            </div>
+
+            <!-- Dynamic Projects List -->
+            <div id="projects-list-container" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 30px;">
+              <!-- Dynamic list loaded from JS -->
+            </div>
+
+            <!-- Add/Edit form -->
+            <div style="padding: 24px; border-radius: var(--border-radius); border: 1px solid var(--border-glass); background: var(--bg-secondary);">
+              <h4 id="project-form-title" style="margin-bottom: 20px; color: var(--text-primary);">Add New Project</h4>
+              <form id="project-form">
+                <input type="hidden" id="proj-id">
+
+                <div class="form-row">
+                  <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                    <input type="text" id="proj-title" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                    <label for="proj-title">Project Title</label>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                    <input type="text" id="proj-github-link" placeholder=" " style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                    <label for="proj-github-link">GitHub Repo Link</label>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                    <input type="text" id="proj-live-link" placeholder=" " style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                    <label for="proj-live-link">Live Project Link</label>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                    <input type="text" id="proj-tech-stack" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                    <label for="proj-tech-stack">Technologies Used (comma separated)</label>
+                  </div>
+                </div>
+
+                <!-- Project Image Preview -->
+                <div id="proj-image-preview-container" style="margin-bottom: 24px; display: none; gap: 20px; align-items: center; padding: 16px; border-radius: 12px; background: var(--bg-secondary); border: 1px solid var(--border-glass);">
+                  <img id="proj-image-preview" src="" alt="Project Preview" style="width: 120px; height: 80px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-glass); flex-shrink:0;">
+                  <div>
+                    <h4 style="font-size: 0.95rem; color: var(--text-primary); margin-bottom: 4px;">Project Image Preview</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.8rem; line-height: 1.4;">Verify your project screenshot looks correct before saving.</p>
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                  <input type="text" id="proj-image-url" placeholder=" " style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                  <label for="proj-image-url">Cloudinary Photo URL (Pasted/Generated)</label>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                  <textarea id="proj-description" rows="4" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;"></textarea>
+                  <label for="proj-description">Detailed Project Description</label>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                  <button type="submit" id="proj-submit-btn" class="btn btn-primary">
+                    <span>Add Project</span> <i class="fa-solid fa-plus"></i>
+                  </button>
+                  <button type="button" id="proj-cancel-btn" class="btn btn-outline" style="display: none;">
+                    Cancel <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- SECTION 7: SKILLSET INVENTORY -->
+          <section id="skills-admin-section" class="admin-form-section">
+            <div style="margin-bottom: 30px;">
+              <span style="font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Skill Stack</span>
+              <h3 style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: var(--text-primary);">Manage Skillset Inventory</h3>
+              <div style="width: 40px; height: 3px; background: var(--primary); border-radius: 2px; margin-top: 10px;"></div>
+            </div>
+
+            <!-- Dynamic Skills List -->
+            <div id="skills-list-container" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 30px;">
+              <!-- Dynamic list loaded from JS -->
+            </div>
+
+            <!-- Add/Edit form -->
+            <div style="padding: 24px; border-radius: var(--border-radius); border: 1px solid var(--border-glass); background: var(--bg-secondary);">
+              <h4 id="skill-form-title" style="margin-bottom: 20px; color: var(--text-primary);">Add New Skill</h4>
+              <form id="skill-form">
+                <input type="hidden" id="skill-id">
+
+                <div class="form-row">
+                  <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                    <input type="text" id="skill-name" placeholder=" " required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: transparent; color: var(--text-primary); outline: none;">
+                    <label for="skill-name">Skill Name (e.g. Java, React)</label>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                    <select id="skill-category" required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: var(--bg-secondary); color: var(--text-primary); outline: none; font-family: var(--font-body); font-size: 0.95rem;">
+                      <option value="" disabled selected hidden>Select Skill Category</option>
+                      <option value="Languages">Languages</option>
+                      <option value="Backend">Backend</option>
+                      <option value="Frontend">Frontend</option>
+                      <option value="Database">Database</option>
+                      <option value="DevOps">DevOps</option>
+                      <option value="Tools">Tools</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group" style="margin-bottom: 24px; position: relative;">
+                    <select id="skill-proficiency" required style="width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border-glass); background: var(--bg-secondary); color: var(--text-primary); outline: none; font-family: var(--font-body); font-size: 0.95rem;">
+                      <option value="" disabled selected hidden>Select Proficiency</option>
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                      <option value="Expert">Expert</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 12px;">
+                  <button type="submit" id="skill-submit-btn" class="btn btn-primary">
+                    <span>Add Skill</span> <i class="fa-solid fa-plus"></i>
+                  </button>
+                  <button type="button" id="skill-cancel-btn" class="btn btn-outline" style="display: none;">
+                    Cancel <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; padding: 16px 24px; border-radius: 8px; font-weight: 600; display: none; background: var(--primary); color: #fff;">
+    <span id="toast-message"></span>
+  </div>
+
+</body>
+
+</html>
