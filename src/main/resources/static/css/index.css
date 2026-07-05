@@ -250,6 +250,22 @@ a {
     color: var(--text-light-primary);
 }
 
+.hero-title .reveal-part {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(15px);
+    animation: revealText 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation-delay: 1.2s;
+}
+
+@keyframes revealText {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
 .hero-subtitle {
     font-size: 1.15rem;
     margin-bottom: 36px;
@@ -1544,33 +1560,7 @@ html:not([data-theme="dark"]) .btn-outline:hover {
     transform: translateY(-2px);
 }
 
-html:not([data-theme="dark"]) .hero-graphic-bg {
-    background: #e6dfd3; /* Warm soft beige */
-    border-radius: 200px 200px 16px 16px; /* Arch frame shape */
-    width: 320px;
-    height: 420px;
-    box-shadow: 0 20px 45px rgba(72, 86, 71, 0.12);
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-}
 
-html:not([data-theme="dark"]) .hero-graphic-bg::before {
-    display: none; /* Disable rotating border */
-}
-
-html:not([data-theme="dark"]) #profileAvatar {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 0;
-    border: none;
-    object-fit: cover;
-}
-
-html:not([data-theme="dark"]) .glow-1,
-html:not([data-theme="dark"]) .glow-2 {
-    display: none; /* Disable background glows in light mode */
-}
 
 html:not([data-theme="dark"]) .floating-badge {
     background: var(--bg-white);
@@ -1885,13 +1875,7 @@ html:not([data-theme="dark"]) .footer-bottom {
 }
 
 /* Light Theme Responsive Overrides */
-@media (max-width: 992px) {
-    html:not([data-theme="dark"]) .hero-graphic-bg {
-        width: 280px;
-        height: 370px;
-        border-radius: 175px 175px 12px 12px;
-    }
-}
+
 
 @media (max-width: 768px) {
     html:not([data-theme="dark"]) .hero-title {
@@ -1909,11 +1893,7 @@ html:not([data-theme="dark"]) .footer-bottom {
 }
 
 @media (max-width: 480px) {
-    html:not([data-theme="dark"]) .hero-graphic-bg {
-        width: 240px;
-        height: 320px;
-        border-radius: 150px 150px 10px 10px;
-    }
+
     html:not([data-theme="dark"]) .hero-title {
         font-size: 2.1rem;
     }

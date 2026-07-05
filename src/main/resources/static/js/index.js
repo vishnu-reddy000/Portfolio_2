@@ -450,7 +450,16 @@ function renderProfile(profile) {
 
     // Bind Hero Title & Subtitle
     const heroTitle = document.getElementById('heroTitle');
-    if (heroTitle && profile.title) heroTitle.textContent = profile.title;
+    if (heroTitle && profile.title) {
+        const ampIndex = profile.title.indexOf('&');
+        if (ampIndex !== -1) {
+            const firstPart = profile.title.substring(0, ampIndex).trim();
+            const secondPart = profile.title.substring(ampIndex).trim();
+            heroTitle.innerHTML = `${firstPart} <span class="reveal-part">${secondPart}</span>`;
+        } else {
+            heroTitle.textContent = profile.title;
+        }
+    }
     
     const heroSubtitle = document.getElementById('heroSubtitle');
     if (heroSubtitle && profile.subtitle) heroSubtitle.textContent = profile.subtitle;
