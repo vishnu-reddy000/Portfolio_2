@@ -425,6 +425,7 @@ function renderProfile(profile) {
         const logoText = document.getElementById('logoText');
         if (logoText) {
             const nameParts = profile.name.trim().split(/\s+/);
+            let generatedHtml = '';
             if (nameParts.length > 1) {
                 let firstPart = nameParts[0].toUpperCase();
                 let restPart = nameParts.slice(1).join(' ');
@@ -435,9 +436,13 @@ function renderProfile(profile) {
                     restPart = nameParts.slice(2).join(' ');
                 }
                 
-                logoText.innerHTML = `${firstPart}<span> ${restPart}</span>`;
+                generatedHtml = `${firstPart}<span> ${restPart}</span>`;
             } else {
-                logoText.innerHTML = `${profile.name.toUpperCase()}<span></span>`;
+                generatedHtml = `${profile.name.toUpperCase()}<span></span>`;
+            }
+
+            if (logoText.innerHTML !== generatedHtml) {
+                logoText.innerHTML = generatedHtml;
             }
         }
         
