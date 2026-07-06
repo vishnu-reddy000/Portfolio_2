@@ -441,16 +441,34 @@ function renderProfile(profile) {
             }
         }
         
-        const copyrightText = document.getElementById('copyrightText');
-        if (copyrightText) {
-            const currentYear = new Date().getFullYear();
-            copyrightText.innerHTML = `&copy; ${currentYear} ${profile.name}. All Rights Reserved.`;
-        }
     }
 
     // Bind Hero Title & Subtitle
     const heroTitle = document.getElementById('heroTitle');
-    if (heroTitle && profile.title) heroTitle.textContent = profile.title;
+    if (heroTitle && profile.title) {
+        let parts = [];
+        if (profile.title.includes('<br>')) {
+            parts = profile.title.split('<br>');
+        } else if (profile.title.includes(' & ')) {
+            parts = profile.title.split(' & ');
+            if (parts.length >= 2) {
+                parts[1] = '& ' + parts[1];
+            }
+        } else {
+            parts = [profile.title];
+        }
+
+        let formattedTitle = '';
+        if (parts.length >= 2) {
+            formattedTitle = `<span class="title-line title-line-1">${parts[0].trim()}</span><span class="title-line title-line-2">${parts[1].trim()}</span>`;
+        } else {
+            formattedTitle = `<span class="title-line title-line-1">${profile.title}</span>`;
+        }
+
+        if (heroTitle.innerHTML !== formattedTitle) {
+            heroTitle.innerHTML = formattedTitle;
+        }
+    }
     
     const heroSubtitle = document.getElementById('heroSubtitle');
     if (heroSubtitle && profile.subtitle) heroSubtitle.textContent = profile.subtitle;
@@ -516,7 +534,11 @@ function renderProfile(profile) {
     if (linkedinLink && profile.linkedinUrl) linkedinLink.href = profile.linkedinUrl;
 
     const naukriLink = document.getElementById('naukriLink');
-    if (naukriLink && profile.naukriUrl) naukriLink.href = profile.naukriUrl;
+    if (naukriLink && profile.naukriUrl) {
+        naukriLink.href = (profile.naukriUrl === 'https://naukri.com') 
+            ? 'https://www.naukri.com/mnjuser/profile' 
+            : profile.naukriUrl;
+    }
 
     const footerGithubLink = document.getElementById('footerGithubLink');
     if (footerGithubLink && profile.githubUrl) footerGithubLink.href = profile.githubUrl;
@@ -525,7 +547,11 @@ function renderProfile(profile) {
     if (footerLinkedinLink && profile.linkedinUrl) footerLinkedinLink.href = profile.linkedinUrl;
 
     const footerNaukriLink = document.getElementById('footerNaukriLink');
-    if (footerNaukriLink && profile.naukriUrl) footerNaukriLink.href = profile.naukriUrl;
+    if (footerNaukriLink && profile.naukriUrl) {
+        footerNaukriLink.href = (profile.naukriUrl === 'https://naukri.com') 
+            ? 'https://www.naukri.com/mnjuser/profile' 
+            : profile.naukriUrl;
+    }
 }
 
 // Load Experiences & Education from REST API

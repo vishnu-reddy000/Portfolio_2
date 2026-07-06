@@ -39,7 +39,7 @@ public class DataInitializer implements CommandLineRunner {
                     .avatarUrl("https://res.cloudinary.com/dp08coqkk/image/upload/v1781195187/WhatsApp_Image_2026-06-06_at_9.25.24_PM_nslt0s.jpg")
                     .githubUrl("https://github.com")
                     .linkedinUrl("https://linkedin.com/in/vishnu-reddy-ab269b333/")
-                    .naukriUrl("https://naukri.com")
+                    .naukriUrl("https://www.naukri.com/mnjuser/profile")
                     .email("vishnumatamala10@gmail.com")
                     .phone("+91 8074407095")
                     .location("Andhra Pradesh, India")
