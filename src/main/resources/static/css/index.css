@@ -273,6 +273,22 @@ a {
     }
 }
 
+.hero-title .reveal-part {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(15px);
+    animation: revealText 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation-delay: 1.2s;
+}
+
+@keyframes revealText {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
 .hero-subtitle {
     font-size: 1.15rem;
     margin-bottom: 36px;
