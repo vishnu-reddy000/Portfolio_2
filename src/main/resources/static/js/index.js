@@ -446,32 +446,37 @@ function renderProfile(profile) {
     // Bind Hero Title & Subtitle
     const heroTitle = document.getElementById('heroTitle');
     if (heroTitle && profile.title) {
-        let parts = [];
-        if (profile.title.includes('<br>')) {
-            parts = profile.title.split('<br>');
-        } else if (profile.title.includes(' & ')) {
-            parts = profile.title.split(' & ');
-            if (parts.length >= 2) {
-                parts[1] = '& ' + parts[1];
+        const currentCleanText = heroTitle.textContent.replace(/\s+/g, ' ').trim();
+        const incomingCleanText = profile.title.replace('<br>', '').replace(/\s+/g, ' ').trim();
+
+        if (currentCleanText !== incomingCleanText) {
+            let parts = [];
+            if (profile.title.includes('<br>')) {
+                parts = profile.title.split('<br>');
+            } else if (profile.title.includes(' & ')) {
+                parts = profile.title.split(' & ');
+                if (parts.length >= 2) {
+                    parts[1] = '& ' + parts[1];
+                }
+            } else {
+                parts = [profile.title];
             }
-        } else {
-            parts = [profile.title];
-        }
 
-        let formattedTitle = '';
-        if (parts.length >= 2) {
-            formattedTitle = `<span class="title-line title-line-1">${parts[0].trim()}</span><span class="title-line title-line-2">${parts[1].trim()}</span>`;
-        } else {
-            formattedTitle = `<span class="title-line title-line-1">${profile.title}</span>`;
-        }
+            let formattedTitle = '';
+            if (parts.length >= 2) {
+                formattedTitle = `<span class="title-line title-line-1">${parts[0].trim()}</span><span class="title-line title-line-2">${parts[1].trim()}</span>`;
+            } else {
+                formattedTitle = `<span class="title-line title-line-1">${profile.title}</span>`;
+            }
 
-        if (heroTitle.innerHTML !== formattedTitle) {
             heroTitle.innerHTML = formattedTitle;
         }
     }
     
     const heroSubtitle = document.getElementById('heroSubtitle');
-    if (heroSubtitle && profile.subtitle) heroSubtitle.textContent = profile.subtitle;
+    if (heroSubtitle && profile.subtitle && heroSubtitle.textContent.trim() !== profile.subtitle.trim()) {
+        heroSubtitle.textContent = profile.subtitle;
+    }
     
     // Bind Profile Avatar (fetches all images from Cloudinary portfolio folder for random rotation)
     const profileAvatar = document.getElementById('profileAvatar');
@@ -484,7 +489,10 @@ function renderProfile(profile) {
             .then(images => {
                 if (images && images.length > 0) {
                     const randomIndex = Math.floor(Math.random() * images.length);
-                    profileAvatar.src = images[randomIndex];
+                    const selectedImage = images[randomIndex];
+                    if (profileAvatar.src !== selectedImage) {
+                        profileAvatar.src = selectedImage;
+                    }
                     profileAvatar.style.display = 'block';
                 } else {
                     loadFallbackAvatar(profile);
@@ -498,17 +506,25 @@ function renderProfile(profile) {
     
     // Bind Career Objective
     const objectiveText = document.getElementById('objectiveText');
-    if (objectiveText && profile.bio) objectiveText.textContent = profile.bio;
+    if (objectiveText && profile.bio && objectiveText.textContent.trim() !== profile.bio.trim()) {
+        objectiveText.textContent = profile.bio;
+    }
     
     // Bind Highlights / Stats
     const statExp = document.getElementById('statExp');
-    if (statExp && profile.experienceYears) statExp.textContent = profile.experienceYears;
+    if (statExp && profile.experienceYears && statExp.textContent.trim() !== profile.experienceYears.trim()) {
+        statExp.textContent = profile.experienceYears;
+    }
 
     const statProjects = document.getElementById('statProjects');
-    if (statProjects && profile.projectsCount) statProjects.textContent = profile.projectsCount;
+    if (statProjects && profile.projectsCount && statProjects.textContent.trim() !== profile.projectsCount.trim()) {
+        statProjects.textContent = profile.projectsCount;
+    }
 
     const statAcademic = document.getElementById('statAcademic');
-    if (statAcademic && profile.academicStanding) statAcademic.textContent = profile.academicStanding;
+    if (statAcademic && profile.academicStanding && statAcademic.textContent.trim() !== profile.academicStanding.trim()) {
+        statAcademic.textContent = profile.academicStanding;
+    }
 
     // Bind Contact Info
     const contactEmail = document.getElementById('contactEmail');
@@ -671,7 +687,10 @@ function loadFallbackAvatar(profile) {
         const urls = profile.avatarUrl.split(/[,;]+/).map(u => u.trim()).filter(u => u.length > 0);
         if (urls.length > 0) {
             const randomIndex = Math.floor(Math.random() * urls.length);
-            profileAvatar.src = urls[randomIndex];
+            const selectedUrl = urls[randomIndex];
+            if (profileAvatar.src !== selectedUrl) {
+                profileAvatar.src = selectedUrl;
+            }
             profileAvatar.style.display = 'block';
         }
     }
