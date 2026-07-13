@@ -38,6 +38,14 @@ public class ProfileService {
         profile.setEmail(profileDetails.getEmail());
         profile.setPhone(profileDetails.getPhone());
         profile.setLocation(profileDetails.getLocation());
+        profile.setResumeUrl(profileDetails.getResumeUrl());
+        profile.setResumeFileName(profileDetails.getResumeFileName());
+
+        // Preserve resume binary data — only overwrite if explicitly provided
+        if (profileDetails.getResumeData() != null) {
+            profile.setResumeData(profileDetails.getResumeData());
+            profile.setResumeContentType(profileDetails.getResumeContentType());
+        }
 
         return profileRepository.save(profile);
     }

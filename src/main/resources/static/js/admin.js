@@ -178,6 +178,7 @@ function loadDashboardData() {
     loadExperiences();
     loadProjects();
     loadSkills();
+    loadResume();
 }
 
 // ----------------------------------------------------
@@ -403,6 +404,9 @@ function initForms() {
     if (skillCancel) {
         skillCancel.addEventListener('click', resetSkillForm);
     }
+
+    // Resume Upload
+    initResumeUpload();
 }
 
 async function saveProfile(profileDetails, successMessage) {
@@ -980,5 +984,197 @@ function updateThemeIcon() {
     } else {
         icon.className = 'fa-solid fa-moon';
         themeToggle.style.color = 'var(--text-secondary)';
+    }
+}
+
+// ----------------------------------------------------
+// RESUME / CV UPLOAD HANDLERS
+// ----------------------------------------------------
+
+// File type → icon mapping
+const RESUME_ICONS = {
+    'pdf':  { icon: 'fa-file-pdf',  color: '#e74c3c' },
+    'doc':  { icon: 'fa-file-word', color: '#2b579a' },
+    'docx': { icon: 'fa-file-word', color: '#2b579a' },
+    'csv':  { icon: 'fa-file-csv',  color: '#27ae60' },
+    'txt':  { icon: 'fa-file-lines',color: '#7f8c8d' },
+};
+
+function getFileExt(filename) {
+    return (filename || '').split('.').pop().toLowerCase();
+}
+
+function updateResumeStatusCard(url, fileName) {
+    const card = document.getElementById('resume-status-card');
+    if (!card) return;
+
+    if (url) {
+        const ext = getFileExt(fileName);
+        const iconInfo = RESUME_ICONS[ext] || { icon: 'fa-file', color: 'var(--primary)' };
+
+        document.getElementById('resume-file-icon').className = `fa-solid ${iconInfo.icon}`;
+        document.getElementById('resume-file-icon').style.color = iconInfo.color;
+        document.getElementById('resume-file-name').textContent = fileName || 'resume.' + ext;
+        // Preview always uses the server-side proxy so it works across origins
+        document.getElementById('resume-preview-link').href = '/api/resume/download';
+        card.style.display = 'flex';
+    } else {
+        card.style.display = 'none';
+    }
+}
+
+async function loadResume() {
+    try {
+        const res = await fetch('/api/resume');
+        if (!res.ok) throw new Error('Resume fetch failed');
+        const data = await res.json();
+        updateResumeStatusCard(data.url, data.fileName);
+    } catch (e) {
+        console.warn('Could not load resume metadata:', e);
+    }
+}
+
+function initResumeUpload() {
+    const dropZone    = document.getElementById('resume-drop-zone');
+    const fileInput   = document.getElementById('resume-file-input');
+    const uploadBtn   = document.getElementById('resume-upload-btn');
+    const btnLabel    = document.getElementById('resume-upload-btn-label');
+    const progressWrap= document.getElementById('resume-progress-wrapper');
+    const progressBar = document.getElementById('resume-progress-bar');
+    const progressPct = document.getElementById('resume-progress-pct');
+    const progressLbl = document.getElementById('resume-progress-label');
+    const dropTitle   = document.getElementById('resume-drop-title');
+    const removeBtn   = document.getElementById('resume-remove-btn');
+
+    if (!dropZone || !fileInput) return;
+
+    let selectedFile = null;
+
+    // Drag-over visual feedback
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = 'var(--primary)';
+        dropZone.style.background  = 'var(--bg-tertiary)';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.style.borderColor = 'var(--border-glass)';
+        dropZone.style.background  = 'var(--bg-secondary)';
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = 'var(--border-glass)';
+        dropZone.style.background  = 'var(--bg-secondary)';
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            onFileSelected(e.dataTransfer.files[0]);
+        }
+    });
+
+    // File input change
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) {
+            onFileSelected(fileInput.files[0]);
+        }
+    });
+
+    function onFileSelected(file) {
+        selectedFile = file;
+        const ext = getFileExt(file.name);
+        const allowed = ['pdf','doc','docx','csv','txt'];
+
+        if (!allowed.includes(ext)) {
+            showToast('Unsupported file type. Use PDF, DOCX, DOC, CSV or TXT.', 'error');
+            selectedFile = null;
+            return;
+        }
+
+        const iconInfo = RESUME_ICONS[ext] || { icon: 'fa-file', color: 'var(--primary)' };
+        dropZone.style.borderColor = 'var(--primary)';
+        if (dropTitle) {
+            dropTitle.innerHTML = `<i class="fa-solid ${iconInfo.icon}" style="color:${iconInfo.color};margin-right:8px;"></i>${file.name}`;
+        }
+        uploadBtn.disabled = false;
+        btnLabel.textContent = `Upload "${file.name}"`;
+    }
+
+    // Upload button
+    uploadBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+
+        uploadBtn.disabled = true;
+        btnLabel.textContent = 'Uploading…';
+        if (progressWrap) progressWrap.style.display = 'block';
+
+        // Animate progress bar (simulated — XHR would give real progress)
+        let pct = 0;
+        const timer = setInterval(() => {
+            pct = Math.min(pct + Math.random() * 18, 90);
+            progressBar.style.width = pct + '%';
+            progressPct.textContent = Math.round(pct) + '%';
+        }, 200);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            const res = await fetch('/api/resume/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            clearInterval(timer);
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Upload failed');
+            }
+
+            progressBar.style.width = '100%';
+            progressPct.textContent = '100%';
+            if (progressLbl) progressLbl.textContent = 'Upload complete!';
+
+            const data = await res.json();
+            updateResumeStatusCard(data.url, data.fileName);
+            showToast('Resume uploaded successfully! Visitors can now download it.', 'success');
+
+            // Reset UI
+            setTimeout(() => {
+                if (progressWrap) progressWrap.style.display = 'none';
+                progressBar.style.width = '0%';
+                progressPct.textContent = '0%';
+                if (progressLbl) progressLbl.textContent = 'Uploading...';
+                dropZone.style.borderColor = 'var(--border-glass)';
+                if (dropTitle) dropTitle.textContent = 'Drag & drop your resume here';
+                btnLabel.textContent = 'Select a file to upload';
+                uploadBtn.disabled = true;
+                selectedFile = null;
+                fileInput.value = '';
+            }, 1500);
+
+        } catch (err) {
+            clearInterval(timer);
+            progressBar.style.width = '0%';
+            if (progressWrap) progressWrap.style.display = 'none';
+            uploadBtn.disabled = false;
+            btnLabel.textContent = `Upload "${selectedFile.name}"`;
+            showToast('Upload failed: ' + err.message, 'error');
+        }
+    });
+
+    // Remove resume
+    if (removeBtn) {
+        removeBtn.addEventListener('click', async () => {
+            if (!confirm('Remove the current resume? Visitors will no longer see the download button.')) return;
+            try {
+                const res = await fetch('/api/resume', { method: 'DELETE' });
+                if (!res.ok) throw new Error('Remove failed');
+                updateResumeStatusCard(null, null);
+                showToast('Resume removed from portfolio.', 'success');
+            } catch (err) {
+                showToast('Error removing resume: ' + err.message, 'error');
+            }
+        });
     }
 }

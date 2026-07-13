@@ -579,6 +579,9 @@
           <button class="sidebar-btn" data-target="skills-admin-section">
             <i class="fa-solid fa-award"></i> Skillset Inventory
           </button>
+          <button class="sidebar-btn" data-target="resume-section">
+            <i class="fa-solid fa-file-arrow-down"></i> Resume / CV
+          </button>
         </aside>
 
         <!-- Form Pane -->
@@ -953,6 +956,73 @@
               </form>
             </div>
           </section>
+
+          <!-- SECTION 8: RESUME / CV -->
+          <section id="resume-section" class="admin-form-section">
+            <div style="margin-bottom: 30px;">
+              <span style="font-family: var(--font-heading); font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 2px;">Document Management</span>
+              <h3 style="font-size: 1.8rem; font-weight: 800; margin-top: 4px; color: var(--text-primary);">Resume / CV Upload</h3>
+              <div style="width: 40px; height: 3px; background: var(--primary); border-radius: 2px; margin-top: 10px;"></div>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 28px; line-height: 1.6;">
+              Upload your latest resume or CV. Supported formats: <strong style="color: var(--text-primary);">PDF, DOCX, DOC, CSV, TXT</strong>.
+              Once uploaded, a <strong style="color: var(--text-primary);">Download Resume</strong> button will appear live on your portfolio homepage for visitors to download.
+            </p>
+
+            <!-- Current Resume Status Card -->
+            <div id="resume-status-card" style="display: none; margin-bottom: 28px; padding: 20px 24px; border-radius: 14px; background: var(--bg-secondary); border: 1px solid var(--border-glass); align-items: center; gap: 20px;">
+              <div style="width: 52px; height: 52px; border-radius: 12px; background: var(--bg-tertiary); border: 1px solid var(--border-glass); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i id="resume-file-icon" class="fa-solid fa-file-pdf" style="font-size: 1.4rem; color: var(--primary);"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <h4 id="resume-file-name" style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">resume.pdf</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Uploaded to Cloudinary · Live on portfolio</p>
+              </div>
+              <div style="display: flex; gap: 10px; flex-shrink: 0;">
+                <a id="resume-preview-link" href="/api/resume/download" target="_blank" class="btn btn-outline" style="padding: 10px 16px; font-size: 0.85rem; gap: 6px; text-decoration: none;">
+                  <i class="fa-solid fa-eye"></i> Preview
+                </a>
+                <button id="resume-remove-btn" class="btn btn-outline" style="padding: 10px 16px; font-size: 0.85rem; gap: 6px; color: #ff4d4d; border-color: rgba(255,77,77,0.3);">
+                  <i class="fa-solid fa-trash-can"></i> Remove
+                </button>
+              </div>
+            </div>
+
+            <!-- Drag & Drop Upload Zone -->
+            <div id="resume-drop-zone"
+              style="border: 2px dashed var(--border-glass); border-radius: 16px; padding: 48px 24px; text-align: center; cursor: pointer; transition: all 0.3s ease; background: var(--bg-secondary); margin-bottom: 24px; position: relative;">
+              <input type="file" id="resume-file-input"
+                accept=".pdf,.doc,.docx,.csv,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/csv,text/plain"
+                style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;">
+              <div id="resume-drop-icon" style="margin-bottom: 16px;">
+                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5rem; color: var(--primary); opacity: 0.7;"></i>
+              </div>
+              <h4 id="resume-drop-title" style="font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 8px 0;">
+                Drag & drop your resume here
+              </h4>
+              <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                or <span style="color: var(--primary); font-weight: 600; text-decoration: underline;">click to browse</span> &nbsp;·&nbsp; PDF, DOCX, CSV, TXT accepted
+              </p>
+            </div>
+
+            <!-- Upload Progress Bar -->
+            <div id="resume-progress-wrapper" style="display: none; margin-bottom: 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);" id="resume-progress-label">Uploading...</span>
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary);" id="resume-progress-pct">0%</span>
+              </div>
+              <div style="height: 6px; border-radius: 999px; background: var(--bg-tertiary); overflow: hidden;">
+                <div id="resume-progress-bar" style="height: 100%; width: 0%; border-radius: 999px; background: var(--primary); transition: width 0.3s ease;"></div>
+              </div>
+            </div>
+
+            <!-- Upload Button -->
+            <button id="resume-upload-btn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 16px; font-size: 1rem;" disabled>
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span id="resume-upload-btn-label">Select a file to upload</span>
+            </button>
+          </section>
+
         </main>
       </div>
     </div>

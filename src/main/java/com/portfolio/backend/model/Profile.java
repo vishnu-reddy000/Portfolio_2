@@ -55,4 +55,15 @@ public class Profile {
     private String phone;
 
     private String location;
+
+    @Column(length = 1000)
+    private String resumeUrl;
+
+    private String resumeFileName;
+
+    private String resumeContentType;
+
+    @Column(name = "resume_data", columnDefinition = "LONGBLOB")
+    @jakarta.persistence.Lob
+    private byte[] resumeData;
 }

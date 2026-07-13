@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initContactForm();
     initWebSocket();
     initScrollSpy();
+    loadResumeButton();
 });
 
 // Mobile Navigation Toggle
@@ -734,4 +735,27 @@ function initWebSocket() {
         console.error('WebSocket error:', error);
         socket.close();
     };
+}
+
+// Resume / CV — dynamic download button
+async function loadResumeButton() {
+    const btn = document.getElementById('resumeDownloadBtn');
+    if (!btn) return;
+
+    try {
+        const res = await fetch('/api/resume');
+        if (!res.ok) throw new Error('Resume API failed');
+        const data = await res.json();
+
+        if (data.url && data.url.trim() !== '') {
+            // Resume exists — show the button. It always hits the server-side proxy
+            // /api/resume/download which streams the file with proper headers.
+            btn.style.display = 'inline-flex';
+        } else {
+            btn.style.display = 'none';
+        }
+    } catch (e) {
+        console.warn('Could not load resume status:', e);
+        btn.style.display = 'none';
+    }
 }
