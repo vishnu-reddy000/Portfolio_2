@@ -314,35 +314,18 @@ function initContactForm() {
             const message = document.getElementById('message').value;
 
             try {
-                // 1. Submit to Web3Forms (primary notification provider)
-                const web3Response = await fetch('https://api.web3forms.com/submit', {
+                // 1. Submit to local portfolio database (this will also trigger Web3Forms on the server)
+                const response = await fetch('/api/inquiries', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({
-                        access_key: 'fddb70b8-f73f-46d6-8da9-db2c070000ba',
-                        name: name,
-                        email: email,
-                        message: message,
-                        subject: `New Portfolio Inquiry from ${name}`
-                    })
+                    body: JSON.stringify({ name, email, message })
                 });
 
-                const web3Data = await web3Response.json();
-
-                if (web3Response.ok && web3Data.success) {
-                    // 2. Concurrently save to local portfolio database for backup
-                    fetch('/api/inquiries', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ name, email, message }),
-                    }).catch(err => console.warn('Backup local DB save failed:', err));
-
-                    // 3. Trigger EmailJS auto-reply email to the inquirer
+                if (response.ok) {
+                    // 2. Trigger EmailJS auto-reply email to the inquirer
                     if (typeof emailjs !== 'undefined') {
                         emailjs.send("service_hzsge9l", "template_9op6ogq", {
                             from_name: "M. Vishnu Vardhan Reddy",
@@ -361,7 +344,8 @@ function initContactForm() {
                     alertBox.style.display = 'block';
                     form.reset();
                 } else {
-                    throw new Error(web3Data.message || 'Web3Forms submission failed');
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Server failed to save inquiry');
                 }
             } catch (error) {
                 console.error('Submission error:', error);
